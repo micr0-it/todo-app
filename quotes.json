@@ -1,0 +1,22 @@
+[
+    { "id": 1,  "quote": "Disiplin, hedeflerle başarı arasındaki köprüdür.", "author": "Jim Rohn", "category": "disiplin" },
+    { "id": 2,  "quote": "Bin millik bir yolculuk tek bir adımla başlar.", "author": "Lao Tzu", "category": "motivasyon" },
+    { "id": 3,  "quote": "Dahilik yüzde bir ilham, yüzde doksan dokuz terdir.", "author": "Thomas Edison", "category": "disiplin" },
+    { "id": 4,  "quote": "Hayat bisiklete binmek gibidir. Dengeni korumak için hareket etmeye devam etmelisin.", "author": "Albert Einstein", "category": "motivasyon" },
+    { "id": 5,  "quote": "Hayatım boyunca defalarca başarısız oldum. İşte bu yüzden başarılıyım.", "author": "Michael Jordan", "category": "motivasyon" },
+    { "id": 6,  "quote": "Antrenmanın her dakikasından nefret ettim ama kendime dedim ki: Bırakma! Şimdi acı çek, hayatının geri kalanını şampiyon olarak yaşa.", "author": "Muhammad Ali", "category": "disiplin" },
+    { "id": 7,  "quote": "Kendine hâkim olamayan hiç kimse özgür değildir.", "author": "Epiktetos", "category": "disiplin" },
+    { "id": 8,  "quote": "İyi bir insanın nasıl olması gerektiğini tartışarak daha fazla vakit kaybetme. İyi bir insan ol.", "author": "Marcus Aurelius", "category": "disiplin" },
+    { "id": 9,  "quote": "Biz erteledikçe hayat hızla akıp gider.", "author": "Seneca", "category": "disiplin" },
+    { "id": 10, "quote": "İyi başlamak, işin yarısıdır.", "author": "Aristoteles", "category": "motivasyon" },
+    { "id": 11, "quote": "Biz, tekrar tekrar yaptığımız şeyleriz. Mükemmellik bir eylem değil, bir alışkanlıktır.", "author": "Will Durant", "category": "disiplin" },
+    { "id": 12, "quote": "Bilmek yetmez, uygulamalıyız. İstemek yetmez, yapmalıyız.", "author": "Goethe", "category": "motivasyon" },
+    { "id": 13, "quote": "Yapabileceğini de düşünsen, yapamayacağını da düşünsen, haklısın.", "author": "Henry Ford", "category": "motivasyon" },
+    { "id": 14, "quote": "İlk ve en büyük zafer, insanın kendini yenmesidir.", "author": "Platon", "category": "disiplin" },
+    { "id": 15, "quote": "Yaşamak için bir 'neden'i olan, hemen her 'nasıl'a katlanabilir.", "author": "Friedrich Nietzsche", "category": "motivasyon" },
+    { "id": 16, "quote": "İyi yapılmış iş, iyi söylenmiş sözden iyidir.", "author": "Benjamin Franklin", "category": "disiplin" },
+    { "id": 17, "quote": "Olduğun yerde, elindekilerle, yapabileceğini yap.", "author": "Theodore Roosevelt", "category": "motivasyon" },
+    { "id": 18, "quote": "Hiçbir şeye ihtiyacımız yok, yalnız bir şeye ihtiyacımız vardır: Çalışkan olmak!", "author": "Mustafa Kemal Atatürk", "category": "disiplin" },
+    { "id": 19, "quote": "On bin farklı tekmeyi bir kez çalışmış adamdan korkmam; tek bir tekmeyi on bin kez çalışmış adamdan korkarım.", "author": "Bruce Lee", "category": "disiplin" },
+    { "id": 20, "quote": "Sabah isteksizce uyandığında şunu düşün: Bir insanın işini yapmak için kalkıyorum.", "author": "Marcus Aurelius", "category": "motivasyon" }
+]

@@ -1,0 +1,1010 @@
+/* =====================================================================
+   NEO-BRUTALIST TO-DO LIST
+   ---------------------------------------------------------------------
+   Neo-brutalizmin temel kuralları:
+     - Kalın siyah kenarlıklar
+     - Bulanıklık olmayan, keskin "kaydırılmış" gölgeler
+     - Doygun, cesur renkler
+     - Kalın, büyük tipografi
+     - Butonlara basınca fiziksel olarak "içeri giriyormuş" hissi
+
+   JS İÇİN KULLANABİLECEĞİN CLASS'LAR:
+     .task-item.completed  -> tamamlanan görev (üstü çizili, soluk)
+     .task-item.removing   -> silinirken oynayan animasyon
+                             (class'ı ekle, ~300ms sonra li'yi sil)
+     #task-list boşsa      -> "Henüz görev yok" yazısı otomatik çıkar
+   ===================================================================== */
+
+   @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Space+Grotesk:wght@500;700&display=swap');
+
+
+   /* ---------------------------------------------------------------------
+      RENKLER VE DEĞİŞKENLER
+      Renkleri değiştirmek istersen sadece burayı düzenlemen yeterli.
+      --------------------------------------------------------------------- */
+   :root {
+       --black:  #111111;
+       --white:  #FFFDF5;
+       --bg:     #F4EBDC;
+       --yellow: #FFD93D;
+       --pink:   #FF7AB6;
+       --blue:   #6FC3FF;
+       --green:  #7CE38B;
+       --orange: #FF9F45;
+       --red:    #FF5A5A;
+   
+       --border: 3px solid var(--black);
+       --shadow: 6px 6px 0 var(--black);
+       --shadow-sm: 4px 4px 0 var(--black);
+       --radius: 10px;
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      GENEL
+      --------------------------------------------------------------------- */
+   *,
+   *::before,
+   *::after {
+       box-sizing: border-box;
+       margin: 0;
+       padding: 0;
+   }
+   
+   body {
+       min-height: 100vh;
+       display: flex;
+       justify-content: center;
+       align-items: flex-start;
+       padding: 60px 16px;
+       font-family: 'Space Grotesk', sans-serif;
+       color: var(--black);
+       background-color: var(--bg);
+       /* Arka plandaki nokta deseni */
+       background-image: radial-gradient(var(--black) 1.2px, transparent 1.2px);
+       background-size: 22px 22px;
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      KART
+      --------------------------------------------------------------------- */
+   .card {
+       width: 100%;
+       max-width: 520px;
+       background: var(--white);
+       border: var(--border);
+       border-radius: var(--radius);
+       box-shadow: 10px 10px 0 var(--black);
+       overflow: hidden;
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      KART BAŞLIĞI
+      --------------------------------------------------------------------- */
+   .card-header {
+       position: relative;
+       padding: 28px 28px 24px;
+       background: var(--yellow);
+       border-bottom: var(--border);
+       /* Çapraz çizgili doku */
+       background-image: repeating-linear-gradient(
+           -45deg,
+           transparent 0 14px,
+           rgba(0, 0, 0, 0.06) 14px 16px
+       );
+   }
+   
+   .card-header h3 {
+       font-family: 'Archivo Black', sans-serif;
+       font-size: clamp(2.2rem, 8vw, 3.2rem);
+       line-height: 0.95;
+       text-transform: uppercase;
+       letter-spacing: -1px;
+   }
+   
+   .subtitle {
+       display: inline-block;
+       margin-top: 14px;
+       padding: 4px 10px;
+       font-weight: 700;
+       background: var(--white);
+       border: var(--border);
+       border-radius: 6px;
+       box-shadow: 3px 3px 0 var(--black);
+       transform: rotate(-2deg);
+   }
+   
+   /* Sağ üstteki eğik etiket */
+   .badge {
+       position: absolute;
+       top: 20px;
+       right: 20px;
+       padding: 6px 12px;
+       font-family: 'Archivo Black', sans-serif;
+       font-size: 0.8rem;
+       background: var(--pink);
+       border: var(--border);
+       border-radius: 999px;
+       box-shadow: 3px 3px 0 var(--black);
+       transform: rotate(8deg);
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      KART GÖVDESİ
+      --------------------------------------------------------------------- */
+   .card-body {
+       padding: 28px;
+   }
+   
+   hr {
+       margin: 28px 0 24px;
+       border: none;
+       border-top: var(--border);
+       border-top-style: dashed;
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      GÖREV EKLEME FORMU
+      --------------------------------------------------------------------- */
+   .input-group {
+       display: flex;
+       gap: 12px;
+   }
+   
+   #txtTaskName {
+       flex: 1;
+       min-width: 0;
+       padding: 14px 16px;
+       font-family: inherit;
+       font-size: 1rem;
+       font-weight: 500;
+       color: var(--black);
+       background: var(--white);
+       border: var(--border);
+       border-radius: var(--radius);
+       box-shadow: var(--shadow-sm);
+       outline: none;
+       transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+   }
+   
+   #txtTaskName::placeholder {
+       color: #888;
+   }
+   
+   #txtTaskName:focus {
+       background: #FFFBE0;
+       transform: translate(-2px, -2px);
+       box-shadow: var(--shadow);
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      BUTONLAR (ortak "basılınca içeri girme" efekti)
+      --------------------------------------------------------------------- */
+   #btnAddNewTask2,
+   #btnDeleteAll {
+       display: inline-flex;
+       align-items: center;
+       gap: 8px;
+       font-family: 'Archivo Black', sans-serif;
+       text-transform: uppercase;
+       color: var(--black);
+       border: var(--border);
+       border-radius: var(--radius);
+       box-shadow: var(--shadow-sm);
+       cursor: pointer;
+       transition: transform 0.1s, box-shadow 0.1s;
+   }
+   
+   #btnAddNewTask2:hover,
+   #btnDeleteAll:hover {
+       transform: translate(-2px, -2px);
+       box-shadow: var(--shadow);
+   }
+   
+   #btnAddNewTask2:active,
+   #btnDeleteAll:active {
+       transform: translate(4px, 4px);
+       box-shadow: 0 0 0 var(--black);
+   }
+   
+   #btnAddNewTask2 {
+       padding: 0 22px;
+       font-size: 1rem;
+       background: var(--green);
+   }
+   
+   #btnDeleteAll {
+       padding: 8px 14px;
+       font-size: 0.75rem;
+       background: var(--red);
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      LİSTE BAŞLIĞI
+      --------------------------------------------------------------------- */
+   .list-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       gap: 12px;
+       margin-bottom: 20px;
+   }
+   
+   #taskCount {
+       font-family: 'Archivo Black', sans-serif;
+       font-size: 1.15rem;
+       text-transform: uppercase;
+       /* Yazının altında vurgu şeridi */
+       background: linear-gradient(transparent 55%, var(--blue) 55%);
+       padding: 0 4px;
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      GÖREV LİSTESİ
+      --------------------------------------------------------------------- */
+   #task-list {
+       list-style: none;
+       display: flex;
+       flex-direction: column;
+       gap: 14px;
+   }
+   
+   /* Liste boşken görünen yazı */
+   #task-list:empty::before {
+       content: "Henüz görev yok. Bir tane ekle!";
+       display: block;
+       padding: 28px;
+       text-align: center;
+       font-weight: 700;
+       border: var(--border);
+       border-style: dashed;
+       border-radius: var(--radius);
+       background: var(--white);
+   }
+   
+   .task-item {
+       display: flex;
+       align-items: center;
+       justify-content: space-between;
+       gap: 12px;
+       padding: 14px 14px 14px 18px;
+       font-weight: 700;
+       font-size: 1.05rem;
+       border: var(--border);
+       border-radius: var(--radius);
+       box-shadow: var(--shadow-sm);
+       cursor: pointer;
+       animation: dropIn 0.35s cubic-bezier(.2, 1.4, .4, 1);
+       transition: transform 0.12s, box-shadow 0.12s;
+   }
+   
+   /* Her görev sırayla farklı renk ve hafif eğim alır */
+   .task-item:nth-child(4n + 1) { background: var(--blue);   transform: rotate(-0.6deg); }
+   .task-item:nth-child(4n + 2) { background: var(--pink);   transform: rotate(0.5deg);  }
+   .task-item:nth-child(4n + 3) { background: var(--orange); transform: rotate(-0.3deg); }
+   .task-item:nth-child(4n + 4) { background: var(--green);  transform: rotate(0.6deg);  }
+   
+   .task-item:hover {
+       transform: translate(-3px, -3px) rotate(0deg);
+       box-shadow: var(--shadow);
+   }
+   
+   .task-item span {
+       flex: 1;
+       word-break: break-word;
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      TAMAMLANAN GÖREV  (JS ile li'ye "completed" class'ı ekle)
+      --------------------------------------------------------------------- */
+   .task-item.completed {
+       background: #E0DCD2;
+       box-shadow: 2px 2px 0 var(--black);
+   }
+   
+   .task-item.completed span {
+       text-decoration: line-through;
+       text-decoration-thickness: 3px;
+       opacity: 0.55;
+   }
+   
+   .task-item.completed::before {
+       content: "\f00c"; /* Font Awesome tik ikonu */
+       font-family: "Font Awesome 6 Free";
+       font-weight: 900;
+       display: grid;
+       place-items: center;
+       width: 26px;
+       height: 26px;
+       flex-shrink: 0;
+       font-size: 0.8rem;
+       background: var(--yellow);
+       border: var(--border);
+       border-radius: 6px;
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      SİLME BUTONU (X)
+      --------------------------------------------------------------------- */
+   .delete-item {
+       display: grid;
+       place-items: center;
+       width: 36px;
+       height: 36px;
+       flex-shrink: 0;
+       color: var(--black);
+       text-decoration: none;
+       background: var(--white);
+       border: var(--border);
+       border-radius: 8px;
+       box-shadow: 3px 3px 0 var(--black);
+       transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+   }
+   
+   .delete-item:hover {
+       background: var(--red);
+       transform: rotate(8deg);
+   }
+   
+   .delete-item:active {
+       transform: translate(3px, 3px);
+       box-shadow: 0 0 0 var(--black);
+   }
+   
+   
+   /* ---------------------------------------------------------------------
+      ANİMASYONLAR
+      --------------------------------------------------------------------- */
+   
+   /* Yeni eklenen görev yukarıdan zıplayarak düşer */
+   @keyframes dropIn {
+       from { opacity: 0; transform: translateY(-16px) scale(0.96); }
+       to   { opacity: 1; }
+   }
+   
+   /* Silinen görev yana kayarak kaybolur
+      JS: li.classList.add("removing");
+          setTimeout(() => li.remove(), 300);                     */
+   .task-item.removing {
+       animation: slideOut 0.3s ease-in forwards;
+       pointer-events: none;
+   }
+   
+   @keyframes slideOut {
+       to { opacity: 0; transform: translateX(60px) rotate(6deg); }
+   }
+   
+   /* ---------------------------------------------------------------------
+   ALERT
+   Türler: .alert-success  .alert-danger  .alert-warning  .alert-info
+   JS için:
+     .alert.hide -> kapanma animasyonu
+                   (class'ı ekle, ~300ms sonra alert'i sil)
+   --------------------------------------------------------------------- */
+#alertContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Container'da alert varsa formla arasına boşluk koy */
+#alertContainer:not(:empty) {
+    margin-bottom: 22px;
+}
+
+.alert {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px 12px 14px;
+    font-weight: 700;
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    animation: alertIn 0.35s cubic-bezier(.2, 1.4, .4, 1);
+}
+
+/* Renkler */
+.alert-success { background: var(--green);  }
+.alert-danger  { background: var(--red);    }
+.alert-warning { background: var(--yellow); }
+.alert-info    { background: var(--blue);   }
+
+/* Soldaki ikon kutusu */
+.alert-icon {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    background: var(--white);
+    border: var(--border);
+    border-radius: 8px;
+    transform: rotate(-6deg);
+}
+
+.alert-text {
+    flex: 1;
+    word-break: break-word;
+}
+
+/* Sağdaki kapatma butonu */
+.alert-close {
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    font-size: 0.9rem;
+    color: var(--black);
+    background: var(--white);
+    border: var(--border);
+    border-radius: 8px;
+    box-shadow: 2px 2px 0 var(--black);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.alert-close:hover {
+    transform: rotate(8deg);
+}
+
+.alert-close:active {
+    transform: translate(2px, 2px);
+    box-shadow: 0 0 0 var(--black);
+}
+
+/* Açılış: yukarıdan sallanarak düşer */
+@keyframes alertIn {
+    0%   { opacity: 0; transform: translateY(-14px) rotate(-1deg); }
+    60%  { transform: translateY(2px) rotate(0.5deg); }
+    100% { opacity: 1; transform: none; }
+}
+
+/* Kapanış */
+.alert.hide {
+    animation: alertOut 0.3s ease-in forwards;
+    pointer-events: none;
+}
+
+
+/* ---------------------------------------------------------------------
+   ARAMA KUTUSU
+   JS için:
+     .task-item.hidden -> aramaya uymayan görevi gizle
+   --------------------------------------------------------------------- */
+   .search-box {
+    position: relative;
+    margin-bottom: 22px;
+}
+
+/* Soldaki büyüteç ikonu */
+.search-box i {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.95rem;
+    pointer-events: none;   /* ikona tıklanınca input'a tıklanmış olsun */
+}
+
+#txtSearch {
+    width: 100%;
+    padding: 12px 16px 12px 44px;   /* soldaki boşluk ikon için */
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--black);
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    outline: none;
+    transition: transform 0.1s, box-shadow 0.1s, background 0.15s;
+}
+
+#txtSearch::placeholder {
+    color: #888;
+}
+
+/* Yazmaya başlayınca kutu öne çıkar */
+#txtSearch:focus {
+    background: #EAF6FF;
+    transform: translate(-2px, -2px);
+    box-shadow: var(--shadow);
+}
+
+/* Aramaya uymayan görev */
+.task-item.hidden {
+    display: none;
+}
+
+@keyframes alertOut {
+    to { opacity: 0; transform: translateX(40px) rotate(3deg); }
+}
+/* Aramaya uymayan görev */
+.task-item.hidden {
+    display: none;
+}
+/* ---------------------------------------------------------------------
+   GÜNLÜK HEDEF (Adım sayar mantığı)
+   JS için:
+     dailyGoal.style.setProperty("--progress", 60) -> halkayı %60 doldurur
+     dailyGoal.classList.add("done")               -> %100 olunca ekle
+   --------------------------------------------------------------------- */
+
+/* --progress değişkenini "sayı" olarak tanıtıyoruz.
+   Böylece değer değişince halka animasyonlu dolar. */
+   @property --progress {
+    syntax: "<number>";
+    inherits: true;
+    initial-value: 0;
+}
+
+.daily-goal {
+    --progress: 0;
+    --ring-color: var(--pink);
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 22px;
+    padding: 18px;
+    margin-bottom: 24px;
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    transition: --progress 0.8s cubic-bezier(.2, 1, .3, 1), background 0.3s;
+}
+
+/* Dış halka: --progress kadarı renkli, kalanı gri */
+.goal-ring {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 116px;
+    height: 116px;
+    flex-shrink: 0;
+    border: var(--border);
+    border-radius: 50%;
+    background: conic-gradient(var(--ring-color) calc(var(--progress) * 1%), #EDE6D8 0);
+    box-shadow: var(--shadow-sm);
+}
+
+/* Halkayı 10 parçaya bölen çizgiler (her biri %10) */
+.goal-ring::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: repeating-conic-gradient(var(--black) 0 1deg, transparent 1deg 36deg);
+}
+
+/* Ortadaki beyaz daire */
+.goal-ring-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 76px;
+    height: 76px;
+    background: var(--white);
+    border: var(--border);
+    border-radius: 50%;
+    transition: background 0.3s;
+}
+
+.goal-percent {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.35rem;
+    line-height: 1;
+}
+
+.goal-label {
+    margin-top: 3px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+/* Sağ taraf: başlık, sayaç, hedef ayarı, mesaj */
+.goal-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+}
+
+.goal-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+}
+
+.goal-title i {
+    color: var(--orange);
+    -webkit-text-stroke: 1.5px var(--black);
+}
+
+.goal-count {
+    font-weight: 700;
+}
+
+#goalDone {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 1.5rem;
+}
+
+/* Hedef ayarlama: [-] HEDEF: 5 [+] */
+.goal-stepper {
+    display: inline-flex;
+    align-items: stretch;
+    overflow: hidden;
+    background: var(--white);
+    border: var(--border);
+    border-radius: 8px;
+    box-shadow: 3px 3px 0 var(--black);
+}
+
+.stepper-btn {
+    width: 32px;
+    font-size: 0.8rem;
+    color: var(--black);
+    background: var(--yellow);
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+
+.stepper-btn:hover {
+    background: var(--orange);
+}
+
+.stepper-btn:active {
+    color: var(--white);
+    background: var(--black);
+}
+
+.stepper-value {
+    min-width: 84px;
+    padding: 5px 10px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.75rem;
+    text-align: center;
+    text-transform: uppercase;
+    border-left: var(--border);
+    border-right: var(--border);
+}
+
+/* Motivasyon mesajı */
+.goal-message {
+    padding: 3px 8px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background: var(--blue);
+    border: 2px solid var(--black);
+    border-radius: 6px;
+    transform: rotate(-1deg);
+}
+
+/* "HEDEF TAMAM" damgası: normalde gizli */
+.goal-badge {
+    position: absolute;
+    top: -16px;
+    right: 14px;
+    padding: 5px 12px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    background: var(--green);
+    border: var(--border);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--black);
+    opacity: 0;
+    transform: rotate(6deg) scale(0);
+    pointer-events: none;
+}
+
+
+/* ----- HEDEF TAMAMLANDI (%100) ----- */
+.daily-goal.done {
+    --ring-color: var(--green);
+    background: #EFFFF1;
+}
+
+.daily-goal.done .goal-ring {
+    animation: ringPop 0.5s cubic-bezier(.2, 1.6, .4, 1);
+}
+
+.daily-goal.done .goal-ring-inner {
+    background: var(--yellow);
+}
+
+.daily-goal.done .goal-message {
+    background: var(--green);
+}
+
+.daily-goal.done .goal-badge {
+    animation: stampIn 0.5s cubic-bezier(.2, 1.6, .4, 1) forwards;
+}
+
+@keyframes ringPop {
+    50% { transform: scale(1.12) rotate(-6deg); }
+}
+
+@keyframes stampIn {
+    from { opacity: 0; transform: rotate(-20deg) scale(2.2); }
+    to   { opacity: 1; transform: rotate(6deg) scale(1); }
+}
+
+/* ---------------------------------------------------------------------
+   GÜNÜN SÖZÜ (Kartın en altı)
+   JS için:
+     #quoteBox.loading  -> söz yüklenirken (yanıp sönen boş satırlar)
+     #quoteBox.changing -> yeni söz gelince oynayan animasyon
+                          (class'ı kaldır, sonra tekrar ekle)
+   --------------------------------------------------------------------- */
+   .card-footer {
+    padding: 30px 28px 28px;
+    background: var(--pink);
+    border-top: var(--border);
+    /* Header'daki çizgili dokunun aynısı */
+    background-image: repeating-linear-gradient(
+        -45deg,
+        transparent 0 14px,
+        rgba(0, 0, 0, 0.06) 14px 16px
+    );
+}
+
+/* Not kağıdı gibi hafif eğik kutu */
+.quote-box {
+    position: relative;
+    padding: 26px 20px 18px;
+    background: var(--white);
+    border: var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    transform: rotate(-1deg);
+}
+
+/* Sol üstteki "GÜNÜN SÖZÜ" etiketi */
+.quote-tag {
+    position: absolute;
+    top: -16px;
+    left: 16px;
+    padding: 5px 12px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    background: var(--yellow);
+    border: var(--border);
+    border-radius: 6px;
+    box-shadow: 3px 3px 0 var(--black);
+    transform: rotate(-3deg);
+}
+
+/* Sağ üstteki büyük tırnak ikonu */
+.quote-icon {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    font-size: 2rem;
+    color: var(--blue);
+    -webkit-text-stroke: 2px var(--black);
+}
+
+.quote-text {
+    min-height: 3.2em;
+    padding-right: 36px;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.45;
+}
+
+.quote-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 16px;
+    padding-top: 14px;
+    border-top: 3px dashed var(--black);
+}
+
+/* Yazarın altında vurgu şeridi (#taskCount ile aynı) */
+.quote-author {
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    background: linear-gradient(transparent 55%, var(--yellow) 55%);
+    padding: 0 4px;
+}
+
+/* "Yeni Söz" butonu */
+.quote-refresh {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    font-family: 'Archivo Black', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    color: var(--black);
+    background: var(--blue);
+    border: var(--border);
+    border-radius: 999px;
+    box-shadow: 3px 3px 0 var(--black);
+    cursor: pointer;
+    transition: transform 0.1s, box-shadow 0.1s;
+}
+
+.quote-refresh:hover {
+    transform: translate(-2px, -2px);
+    box-shadow: 5px 5px 0 var(--black);
+}
+
+/* Üzerine gelince ikon döner */
+.quote-refresh i {
+    transition: transform 0.3s;
+}
+
+.quote-refresh:hover i {
+    transform: rotate(180deg);
+}
+
+.quote-refresh:active {
+    transform: translate(3px, 3px);
+    box-shadow: 0 0 0 var(--black);
+}
+
+
+/* ----- YÜKLENİYOR DURUMU ----- */
+.quote-box.loading .quote-text,
+.quote-box.loading .quote-author {
+    color: transparent;      /* yazıyı gizle, kutuların şekli kalsın */
+    border-radius: 6px;
+    background: #E7E0D2;
+    animation: quotePulse 1s ease-in-out infinite;
+}
+
+.quote-box.loading .quote-refresh {
+    pointer-events: none;    /* yüklenirken butona tekrar basılamasın */
+    opacity: 0.6;
+}
+
+@keyframes quotePulse {
+    50% { opacity: 0.4; }
+}
+
+
+/* ----- YENİ SÖZ GELDİĞİNDE ----- */
+.quote-box.changing {
+    animation: quoteFlip 0.45s cubic-bezier(.2, 1.4, .4, 1);
+}
+
+@keyframes quoteFlip {
+    0%   { transform: rotate(-1deg) rotateX(90deg); opacity: 0; }
+    100% { transform: rotate(-1deg) rotateX(0);     opacity: 1; }
+}
+/* =====================================================================
+   RESPONSIVE (Ekran boyutuna göre uyum)
+   ---------------------------------------------------------------------
+
+   Kırılma noktaları:
+     900px ve üstü -> masaüstü: kart biraz daha geniş
+     600px ve altı -> tablet / büyük telefon: boşluklar azalır
+     480px ve altı -> telefon: form alt alta, halka küçülür
+     380px ve altı -> küçük telefon: günlük hedef alt alta dizilir
+   ===================================================================== */
+
+/* Tüm ekranlarda: butonlardaki yazı alt satıra kırılmasın */
+#btnDeleteAll,
+#addTaskForm button,
+.quote-refresh,
+.goal-stepper {
+    white-space: nowrap;
+}
+
+
+/* ---------- MASAÜSTÜ (900px ve üstü) ---------- */
+@media (min-width: 900px) {
+    body              { padding: 80px 24px; }
+    .card             { max-width: 600px; }
+    .card-header,
+    .card-body        { padding: 32px; }
+    .card-footer      { padding: 34px 32px 32px; }
+}
+
+
+/* ---------- TABLET / BÜYÜK TELEFON (600px ve altı) ---------- */
+@media (max-width: 600px) {
+    body              { padding: 32px 14px; }
+    .card             { box-shadow: 7px 7px 0 var(--black); }
+    .card-header,
+    .card-body        { padding: 22px; }
+    .card-footer      { padding: 28px 22px 22px; }
+    hr                { margin: 24px 0 20px; }
+}
+
+
+/* ---------- TELEFON (480px ve altı) ---------- */
+@media (max-width: 480px) {
+    body              { padding: 20px 10px; background-size: 18px 18px; }
+    .card             { box-shadow: 5px 5px 0 var(--black); }
+    .card-header,
+    .card-body        { padding: 18px; }
+    .card-footer      { padding: 26px 18px 18px; }
+
+    /* Başlık */
+    .card-header h3   { font-size: 2rem; }
+    .badge            { top: 14px; right: 14px; font-size: 0.7rem; padding: 4px 10px; }
+    .subtitle         { font-size: 0.85rem; }
+
+    /* Görev ekleme formu: input ve buton alt alta */
+    .input-group      { flex-direction: column; }
+    #addTaskForm button { justify-content: center; padding: 13px; }
+
+    /* Günlük hedef */
+    .daily-goal       { gap: 14px; padding: 14px; }
+    .goal-ring        { width: 96px; height: 96px; }
+    .goal-ring-inner  { width: 62px; height: 62px; }
+    .goal-percent     { font-size: 1.1rem; }
+    .goal-label       { font-size: 0.5rem; }
+    .goal-title       { font-size: 0.9rem; }
+    #goalDone         { font-size: 1.25rem; }
+    .stepper-value    { min-width: 70px; padding: 5px 6px; font-size: 0.68rem; }
+    .stepper-btn      { width: 28px; }
+
+    /* Liste başlığı */
+    .list-header      { margin-bottom: 16px; }
+    #taskCount        { font-size: 1rem; }
+    #btnDeleteAll     { padding: 7px 10px; font-size: 0.68rem; }
+
+    /* Görevler */
+    #task-list        { gap: 12px; }
+    .task-item        { padding: 12px 12px 12px 14px; font-size: 0.95rem; }
+    .delete-item      { width: 32px; height: 32px; }
+    #task-list:empty::before { padding: 22px 14px; }
+
+    /* Alert */
+    .alert            { font-size: 0.9rem; padding: 10px 10px 10px 12px; }
+
+    /* Günün sözü */
+    .quote-box        { padding: 24px 16px 16px; }
+    .quote-text       { font-size: 1rem; padding-right: 28px; }
+    .quote-icon       { font-size: 1.6rem; right: 12px; }
+}
+
+
+/* ---------- KÜÇÜK TELEFON (380px ve altı) ---------- */
+@media (max-width: 380px) {
+    .card-header h3   { font-size: 1.75rem; max-width: 75%; }
+
+    /* Günlük hedef: halka üstte, bilgiler altta, ortalı */
+    .daily-goal       { flex-direction: column; text-align: center; padding-top: 20px; }
+    .goal-info        { align-items: center; }
+    .goal-badge       { left: 0; right: 0; width: max-content; margin: 0 auto; } /* damgayı ortala */
+
+    /* Liste başlığı: sığmazsa buton alt satıra geçsin */
+    .list-header      { flex-wrap: wrap; }
+
+    .task-item        { font-size: 0.9rem; gap: 10px; }
+}

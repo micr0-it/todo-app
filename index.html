@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>To-Do List App</title>
+    <!-- Font Awesome İkonları (Kursta kullanılan silme ikonları için) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+
+    <div class="card">
+        <div class="card-header">
+            <span class="badge">v1.0</span>
+            <!-- lang="en": Türkçe sayfada büyük harfe çevirince "LİST" olmasın diye -->
+            <h3 lang="en">To-Do List App</h3>
+            <p class="subtitle">Bugün ne yapıyoruz?</p>
+        </div>
+        
+        <div class="card-body">
+
+            <div class="card-body">
+
+                <!-- Günlük Hedef -->
+                <div class="daily-goal" id="dailyGoal" style="--progress: 60;">
+                    <!-- %100 olunca görünen damga -->
+                    <span class="goal-badge"><i class="fa-solid fa-trophy"></i> Hedef Tamam!</span>
+            
+                    <!-- Adım sayar halkası -->
+                    <div class="goal-ring">
+                        <div class="goal-ring-inner">
+                            <span class="goal-percent" id="goalPercent">60%</span>
+                            <span class="goal-label">Tamam</span>
+                        </div>
+                    </div>
+            
+                    <div class="goal-info">
+                        <h4 class="goal-title"><i class="fa-solid fa-fire"></i> Günlük Hedef</h4>
+                        <p class="goal-count"><span id="goalDone">3</span> / <span id="goalTotal">5</span> görev</p>
+            
+                        <!-- Günlük hedefi artır / azalt -->
+                        <div class="goal-stepper">
+                            <button type="button" class="stepper-btn" id="btnGoalMinus"><i class="fa-solid fa-minus"></i></button>
+                            <span class="stepper-value">Hedef: <span id="goalValue">5</span></span>
+                            <button type="button" class="stepper-btn" id="btnGoalPlus"><i class="fa-solid fa-plus"></i></button>
+                        </div>
+            
+                        <p class="goal-message" id="goalMessage">Az kaldı, devam et!</p>
+                    </div>
+                </div>
+            
+                <!-- Alertler buraya dinamik olarak eklenecek -->
+                <div id="alertContainer"></div>
+                
+            
+
+            <!-- Alertler buraya dinamik olarak eklenecek -->
+            <div id="alertContainer">
+                <!-- Tasarımı görmek için örnek. JS'i yazınca bu div'i sil, container boş kalsın.
+                Türler: alert-success, alert-danger, alert-warning, alert-info -->
+                
+            </div>
+
+
+            <!-- Görev Ekleme Formu -->
+            <form id="addTaskForm">
+                <div class="input-group">
+                    <input type="text" id="txtTaskName" placeholder="Yeni görev ekleyin..." autocomplete="off">
+                    <button type="submit" id="btnAddNewTask2" class="btn btn-primary mt-4 btn-sm">
+                        <i class="fa-solid fa-plus"></i> Ekle
+                    </button>
+                </div>
+            </form>
+
+            <hr>
+
+            <!-- Görev Listesi ve Temizleme Butonu -->
+            <div class="task-container">
+                <div class="list-header">
+                    <span id="taskCount">Görev Listesi</span>
+                    <button id="btnDeleteAll" type="button">
+                        <i class="fa-solid fa-trash"></i> Tümünü Sil
+                    </button>
+                    <!--
+                        böyle tagların ıcınde de event tetiklenebilir fakat istemiyoruz
+                     <button onclick="document.querySelector('#taskCount').textContent ='butona basıldı degıstım' " id="btnDeleteAll" type="button">Tümünü Sil</button> 
+                     -->
+                </div>
+                
+                <div class="search-box">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="txtSearch" placeholder="Görevlerde ara..." autocomplete="off">
+                </div>
+
+                <ul id="task-list">
+                    <!-- Ders 64'teki JS kodlarının eklediği dinamik li yapısı örneği:
+                         Tamamlanan görev için li'ye "completed" class'ı ekle.
+                     -->
+                    <!-- <li class="task-item">
+                        <span>Örnek Görev</span>
+                        <a href="#" class="delete-item">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    </li> 
+                   
+                    <li class="task-item hidden">
+                        <span>Örnek Görev</span>
+                        <a href="#" class="delete-item">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    </li> 
+                   
+                    <li class="task-item">
+                        <span>Örnek Görev</span>
+                        <a href="#" class="delete-item">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    </li> 
+                   
+                    <li class="task-item">
+                        <span>Örnek Görev</span>
+                        <a href="#" class="delete-item">
+                            <i class="fa-solid fa-xmark"></i>
+                        </a>
+                    </li>  -->
+                   
+                </ul>
+            </div>
+        </div>
+    </div> <!-- card-body'nin kapanışı -->
+
+    <!-- Günün Sözü -->
+    <div class="card-footer">
+        <div class="quote-box" id="quoteBox">
+            <span class="quote-tag">Günün Sözü</span>
+            <i class="fa-solid fa-quote-right quote-icon"></i>
+
+            <p class="quote-text" id="quoteText">Disiplin, hedeflerle başarı arasındaki köprüdür.</p>
+
+            <div class="quote-bottom">
+                <!-- lang="en": büyük harfe çevirince "JİM" olmasın diye -->
+                <span class="quote-author" id="quoteAuthor" lang="en">Jim Rohn</span>
+                <button type="button" class="quote-refresh" id="btnNewQuote">
+                    <i class="fa-solid fa-rotate"></i> Yeni Söz
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div> <!-- card'ın kapanışı -->
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
