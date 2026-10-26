@@ -103,7 +103,7 @@ Renkler `style.css`'in en üstündeki `:root` bölümünden değiştirilebilir.
 
 ### Sıradakiler
 - [ ] **Görev tamamlama:** Göreve tıklayınca `completed` class'ı eklenecek
-- [+] **Storage yapısını değiştirme:** `["Ödev"]` yerine `[{ text: "Ödev", completed: false }]` kullanılacak. Ekleme, silme, listeleme ve `removeToDoStorage` buna göre güncellenecek.
+- [x] **Storage yapısını değiştirme:** `["Ödev"]` yerine `[{ text: "Ödev", completed: false }]` kullanılacak. Ekleme, silme, listeleme ve `removeToDoStorage` buna göre güncellenecek.
 - [ ] **Sayacı düzeltme:** Yüzde, eklenen görevlere göre değil tamamlanan görevlere göre hesaplanacak (`todos.filter(todo => todo.completed).length`)
 - [ ] **Gün kontrolü:** Yeni bir günde sayaç sıfırlanacak (`lastDate` ile `toDateString()` karşılaştırılarak)
 - [ ] `checkDoneToggle` tek satıra indirilecek ve `switch`'in dışına alınacak
