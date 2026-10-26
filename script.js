@@ -103,20 +103,27 @@ function removeToDoUI(e) {
         todoLiTag.remove(); //li ye eriştik ve sildi
         
         //Burada Storage'den sileceğiz bize value değer lazım bunu da todoLiTag'teki text contenti alarak yapalım
-        removeToDoStorage(todoLiTag.textContent);
-        
+        removeToDoStorage(Number(todoLiTag.dataset.id));
+        /**
+         * Number neden şart? Storage’daki id bir sayı (1730000000000). 
+         * dataset ise her zaman yazı döner ("1730000000000"). 
+         * Bir sonraki adımda === ile karşılaştıracağız. 
+         * === hem değere hem türe baktığı için 1730000000000 === "1730000000000" sonucu false olur ve görev hiç bulunamaz.
+         */
         showAlert("success","Görev Başarıyla Silindi...");
     }
 }
 
 
-function removeToDoStorage(removeToDoText) {
+function removeToDoStorage(removeToDoId) {
     checkToDosFromStorage();//storage ıle ısleem yapacaksak sureklı guncel degerı alıyoruz bu da bize let todos=[] atyıor ve uzerıdne  ıslem yapıyoruz
     
     //eskiden forEach ile dönüp splice yapıyorduk:
     //aynı isimde iki görev varsa ikisi de siliniyordu, bir de forEach içinde splice dizi kaydığı için eleman atlatıyordu
     //indexOf sadece İLK eşleşenin indexini verir, bulamazsa -1 döner
-    const index = todos.indexOf(removeToDoText);
+    const index = todos.findIndex(function (todo) {
+        return todo.id === removeToDoId;
+    });
     if (index !== -1) {
         todos.splice(index,1) //burada splice bize nerden baslayacagını ve nereye kadar sılecegını sordu bız kendi indexini verip 1 yazarsak direk kendini silecek
     }
@@ -150,10 +157,11 @@ function addTodo(e) {
         showAlert("danger","Görev giriniz...");
     }
     else{
+        const newTodo = { id: Date.now(), text: inputText, completed: false, completedDate: null };
         //Arayüz eklenmesi
-        addTodoUIPage(inputText);
+        addTodoUIPage(newTodo);
         //Storage ekleme
-        addToDoStorage(inputText);
+        addToDoStorage(newTodo);
         //Bilgilendirme -- iki parametre alacak , içindeki mesaj ve alertin rengi için type
         showAlert("success","Görev başarıyla eklendi!");
         
@@ -198,7 +206,11 @@ function updateGoalDone() {
 function addToDoStorage(newTodo) {
     
     checkToDosFromStorage();   
-   
+    // let objTodo = {
+    //     id : Date.now(),
+    //     completed: false,
+    //     completedDate : null
+    // }
     todos.push(newTodo);
     localStorage.setItem("todos", JSON.stringify(todos)); //Burada da array olarak alınan todosa klavyeye ekleyerek alınan değeri jsona çevirerek ekledik
     updateGoalDone();
@@ -212,10 +224,24 @@ function checkToDosFromStorage() {
     //Burada soruyor ki localStorage de todos keyine sahip bir şey var mı?
     if (localStorage.getItem("todos")===null) {
         todos = []; //Yoksa boş başlat
-    }else{
-        //varsa değerleri de ver bize arraye çevrilmiş şekilde todosa ekle
-        todos = JSON.parse(localStorage.getItem("todos")); //araya çevrilmiş şekilde todosumu aldım
     }
+    try {
+        todos = JSON.parse(localStorage.getItem("todos")); //araya çevrilmiş şekilde todosumu aldım
+    } catch (err) {
+        todos = []; //storage'daki veri JSON değilse (bozuksa) uygulama çökmesin, boş başlat
+    }
+    //gelen şey dizi değilse (tek obje vb.) boş diziyle başla
+    if (!Array.isArray(todos)) {
+        todos = [];
+    }
+
+    //eski formatta yazı olarak kaydedilmiş görevleri ("Ödev") yeni obje formatına çevir
+    todos = todos.map(function (todo, index) {
+        if (typeof todo === "string") {
+            return { id: Date.now() + index, text: todo, completed: false, completedDate: null };
+        }
+        return todo; //zaten objeyse olduğu gibi bırak
+    });
 }
 function checkGoalCounterFromStorage(){
     //getItem ya string ("5") ya da null döner, hiçbir zaman 0 sayısını dönmez
@@ -348,8 +374,10 @@ function addTodoUIPage(newTodo) {
     // </li> 
     const li = document.createElement("li");
     li.className = "task-item";
+    li.dataset.id = newTodo.id;
+    if(newTodo.completed) li.classList.add("completed");
     const span = document.createElement("span");
-    span.textContent = newTodo;
+    span.textContent = newTodo.text;
     const a = document.createElement("a");
     a.className = "delete-item";
     a.href = "#";
