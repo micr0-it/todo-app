@@ -385,14 +385,12 @@ function changeGoalCircle(finishedGoal, waitingGoal){
             //buraya geldiyse zaten 25 ve üstü, alt sınırı tekrar yazmaya gerek yok
             spanGoalMessage.textContent = "Hadi ama yapabilirsin!";
             break;
-        case (yuzde <= 75):
+        case (yuzde <= 100):
             spanGoalMessage.textContent = "Az kaldı, devam et!";
             break;
-        case (yuzde <= 100):
-            spanGoalMessage.textContent = "Tebrikler Dostum!";
-            break;
         default:
-            console.log("hata"); //yüzde 0-100 dışında bir şey geldiyse
+            //buraya sadece 100 gelebilir (Math.min ile 100'ü geçmesini zaten engelledik)
+            spanGoalMessage.textContent = "Tebrikler Dostum!";
             break;
     }
 }
