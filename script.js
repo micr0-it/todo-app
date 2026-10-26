@@ -37,6 +37,7 @@ function runEvents() {
     form.addEventListener("submit", addTodo);
     document.addEventListener("DOMContentLoaded",showToDosUI); //sayfa yüklendiğinde (domloaded) benim showToDosUI metodumu calıstır)
     taskContainer.addEventListener("click", removeToDoUI);
+    taskContainer.addEventListener("click", completeToDoUI)
     addGoalCount.addEventListener("click", function(){ changeGoalCounter(1); }); //artı butonu +1 gönderiyor
     removeGoalCount.addEventListener("click", function(){ changeGoalCounter(-1); }); //eksi butonu -1 gönderiyor
     clearButton.addEventListener("click", removeToDoALL);
@@ -90,7 +91,49 @@ function removeToDoALL() {
 }
 
 
+function completeToDoUI(e) {   
+    const deleteButton = e.target.closest(".delete-item");
+    if (deleteButton)
+        {
+            return;
+        }
+    const toDoLitag = e.target.closest(".task-item");
+    if(!toDoLitag){
+        return;
+    }
+    toDoLitag.classList.toggle("completed");
+    const isCompleted = toDoLitag.classList.contains("completed"); // tamamlandıysa bize true dönecek
+    updateToDoCompleteStorage(Number(toDoLitag.dataset.id), isCompleted); // storage de tamamlandı olarak güncellenecek
+}
 
+    function updateToDoCompleteStorage(todoID, isCompleted){
+    console.log("updateToDoCompleteStorage girdim");
+    
+    checkToDosFromStorage();
+    const foundToDo = todos.find((todo) => todo.id === todoID);
+    console.log(foundToDo);
+    
+    if(!foundToDo){
+        return;
+        
+    }
+    foundToDo.completed = isCompleted;
+    // if (foundToDo.completedDate===""||foundToDo.completedDate===null) {
+    //     foundToDo.completedDate = new Date().toDateString();
+    // }
+    // else{
+    //     foundToDo.completedDate = null;;
+    // }
+
+    if (isCompleted) {
+        foundToDo.completedDate = new Date().toDateString();
+    } else {
+        foundToDo.completedDate = null;
+    }
+
+    localStorage.setItem("todos", JSON.stringify(todos));
+
+}
 
 function removeToDoUI(e) {
     //eskiden className==="fa-solid fa-xmark" ile bakıyorduk, sadece ikona tam basınca calısıyordu
