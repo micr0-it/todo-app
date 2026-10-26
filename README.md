@@ -65,7 +65,7 @@ npx serve
 |---|---|---|
 | `todos` | Görev listesi (JSON) | `[{"id":1730000000000,"text":"Ödev","completed":false,"completedDate":null}]` |
 | `goal` | Günlük hedef sayısı | `"5"` |
-| `lastDate` | Son giriş tarihi *(planlanıyor)* | `"Mon Oct 26 2026"` |
+| `lastDate` | Son giriş tarihi  | `"Mon Oct 26 2026"` |
 
 ---
 
