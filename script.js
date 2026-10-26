@@ -26,7 +26,6 @@ console.log(quoteBtn);
 
 
 let goalValue = 1; //günlük hedef SAYISI (en az 1 olmalı yoksa 0'a bölme hatası alırız)
-
 let todos = []; //bunu neden global olarak tanımladık şimdi iki ayrı fonksiyon da kullandım
 //biri sürekli kontrol etmektense modüler bir yapıda giderek bir kontrol metodunda
 //bir de ana ekleme metodum da lazım bana
@@ -91,6 +90,9 @@ function removeToDoALL() {
 }
 
 
+
+
+
 function completeToDoUI(e) {   
     const deleteButton = e.target.closest(".delete-item");
     if (deleteButton)
@@ -106,33 +108,12 @@ function completeToDoUI(e) {
     updateToDoCompleteStorage(Number(toDoLitag.dataset.id), isCompleted); // storage de tamamlandı olarak güncellenecek
 }
 
-    function updateToDoCompleteStorage(todoID, isCompleted){
-    console.log("updateToDoCompleteStorage girdim");
-    
-    checkToDosFromStorage();
-    const foundToDo = todos.find((todo) => todo.id === todoID);
-    console.log(foundToDo);
-    
-    if(!foundToDo){
-        return;
-        
-    }
-    foundToDo.completed = isCompleted;
-    // if (foundToDo.completedDate===""||foundToDo.completedDate===null) {
-    //     foundToDo.completedDate = new Date().toDateString();
-    // }
-    // else{
-    //     foundToDo.completedDate = null;;
-    // }
 
-    if (isCompleted) {
-        foundToDo.completedDate = new Date().toDateString();
-    } else {
-        foundToDo.completedDate = null;
-    }
 
-    localStorage.setItem("todos", JSON.stringify(todos));
-
+function updateGoalDone() {
+    const doneCount = getDoneCount();   //eskiden: checkToDosFromStorage() + todos.length
+    spanGoalDone.textContent = doneCount;
+    changeGoalCircle(doneCount, goalValue);
 }
 
 function removeToDoUI(e) {
@@ -207,7 +188,7 @@ function addTodo(e) {
         addToDoStorage(newTodo);
         //Bilgilendirme -- iki parametre alacak , içindeki mesaj ve alertin rengi için type
         showAlert("success","Görev başarıyla eklendi!");
-        
+        updateGoalDone();
     }
 }
 
@@ -238,12 +219,7 @@ function saveGoalToStorage(){
 
 
 //addGoalCounter ve removeGoalCounter birebir aynıydı, tek fonksiyon yaptık
-//NOT: şu an EKLENEN görev sayısını sayıyor, tamamlama özelliği gelince burayı değiştir
-function updateGoalDone() {
-    checkToDosFromStorage();
-    spanGoalDone.textContent = todos.length;
-    changeGoalCircle(todos.length, goalValue); //halkayı da güncelle, eskiden sadece yenileyince güncelleniyordu
-}
+//NOT: şu an EKLENEN görev sayısını sayıyor, tamamlama özelliği gelince burayı değiştir ** değiştirildi
 
 
 function addToDoStorage(newTodo) {
@@ -258,6 +234,50 @@ function addToDoStorage(newTodo) {
     localStorage.setItem("todos", JSON.stringify(todos)); //Burada da array olarak alınan todosa klavyeye ekleyerek alınan değeri jsona çevirerek ekledik
     updateGoalDone();
 }
+
+
+
+function updateToDoCompleteStorage(todoID, isCompleted){
+    
+    // checkToDosFromStorage();
+    const foundToDo = todos.find((todo) => todo.id === todoID);
+    
+    //1) DEĞİŞTİRMEDEN ÖNCE: bu görev bugün mü tamamlanmıştı?
+    const today = new Date().toDateString();
+    const wasCompletedToday = foundToDo.completedDate === today;
+    
+    
+    //2) görevin durumunu ve tarihini güncelle
+    if(isCompleted){
+        foundToDo.completedDate = today;
+    }
+    else {
+        foundToDo.completedDate = null; //geri alındıysa tarihi sil
+    }
+    
+    foundToDo.completed = isCompleted;
+    const count = Math.max(0, getDoneCount() - 1);
+    
+    
+    if (isCompleted) {
+        saveDoneCount(getDoneCount() + 1);
+    } else if (wasCompletedToday) {
+        saveDoneCount(Math.max(0, getDoneCount() - 1)); //bugün tamamlanmış görev geri alındı -> -1
+    }
+
+    localStorage.setItem("todos", JSON.stringify(todos));
+    updateGoalDone();
+}
+
+function getDoneCount(){   
+    //storage'da yoksa null gelir, Number(null) = 0 olur
+    //bozuk bir değer gelirse NaN olur, || 0 ile onu da 0 yaptık
+    return Number(localStorage.getItem("doneCount")) || 0;
+}
+function saveDoneCount(count) {
+    localStorage.setItem("doneCount", count);
+}
+
 
 function checkToDosFromStorage() {
     //Storage dolu duruyor olabilir
