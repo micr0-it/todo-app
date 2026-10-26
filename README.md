@@ -106,12 +106,12 @@ Renkler `style.css`'in en üstündeki `:root` bölümünden değiştirilebilir.
 - [x] **Storage yapısını değiştirme:** `["Ödev"]` yerine `[{ text: "Ödev", completed: false }]` kullanılacak. Ekleme, silme, listeleme ve `removeToDoStorage` buna göre güncellenecek.
 - [x] **Sayacı düzeltme:** Yüzde, eklenen görevlere göre değil tamamlanan görevlere göre hesaplanacak (`todos.filter(todo => todo.completed).length`)
 - [x] **Gün kontrolü:** Yeni bir günde sayaç sıfırlanacak (`lastDate` ile `toDateString()` karşılaştırılarak)
-- [ ] `checkDoneToggle` tek satıra indirilecek ve `switch`'in dışına alınacak
+- [x] `checkDoneToggle` tek satıra indirilecek ve `switch`'in dışına alınacak
 
-### Karar Bekleyenler
-- [ ] Tamamlanmış bir görev silinince yüzde düşsün mü, sabit mi kalsın?
-- [ ] Yeni gün başlayınca neler sıfırlansın? (sadece sayaç / tamamlanan görevler / hedef)
-- [ ] "Tebrikler Dostum!" mesajı %76'dan itibaren mi çıksın, sadece %100'de mi?
+### Verilen Kararlar
+- [x] Tamamlanmış bir görev silinince yüzde düşsün mü, sabit mi kalsın?
+- [x] Yeni gün başlayınca neler sıfırlansın? (sadece sayaç / tamamlanan görevler / hedef)
+- [x] "Tebrikler Dostum!" mesajı %76'dan itibaren mi çıksın, sadece %100'de mi?
 - [ ] Günün sözü gün boyunca aynı mı kalsın, her açılışta mı değişsin?
 
 ### Gelecek Fikirleri
