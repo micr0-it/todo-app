@@ -320,6 +320,14 @@ function checkGoalCounterFromStorage(){
         goalValue = 1;
     }
 }
+
+
+
+function checkNewDay() {
+    
+}
+
+
 function showAlert(type, message){
     
     // <div class="alert alert-succes"> 
@@ -420,10 +428,9 @@ function apiGetQuotes(api){
 function checkToday() {
     const today = new Date().toDateString();
     const lastDate = localStorage.getItem("lastDate");
-
     if (lastDate !== today) {
         localStorage.setItem("lastDate", today);
-        apiGetQuotes(api);
+        saveDoneCount(0);
     }
 }
 
