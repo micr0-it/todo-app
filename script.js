@@ -21,7 +21,6 @@ const spanGoalMessage = document.querySelector("#goalMessage");
 //Motivasyon Sözleri için API Adresi ve Buton
 const api = "quotes.json";
 const quoteBtn = document.querySelector("#btnNewQuote");
-console.log(quoteBtn);
 
 
 
@@ -40,7 +39,7 @@ function runEvents() {
     addGoalCount.addEventListener("click", function(){ changeGoalCounter(1); }); //artı butonu +1 gönderiyor
     removeGoalCount.addEventListener("click", function(){ changeGoalCounter(-1); }); //eksi butonu -1 gönderiyor
     clearButton.addEventListener("click", removeToDoALL);
-    quoteBtn.addEventListener("click", function(){ apiGetQuotes(api)});
+    quoteBtn.addEventListener("click", function(){ apiGetQuotes(api, true)});
     filterInput.addEventListener("input",filterToDo); //keyup yerine input: yazma, silme, mouse ile yapıştırma hepsinde calısır
     
 }
@@ -166,12 +165,13 @@ function showGoalCountsUI() {
 
 function showToDosUI() {
     
-    checkToday(); //günlük söz veya sayaç sıfırlama gibi şeyler için lazım
+    checkToday(); //sayaç sıfırlama gibi şeyler için lazım
     checkToDosFromStorage(); //Bunu çağırdık global scopeta olan todosumuza bu fonksiyon kaydedilen todosları array olarak atadı
     todos.forEach(function(todo) {
         addTodoUIPage(todo); //todolarımızıa ui ekledik modüler bir metot sayesinde
     });      
     showGoalCountsUI(); //todos zaten global oldugu ıcın parametre olarak göndermeye gerek yok
+    apiGetQuotes(api, false);
 }
 
 function addTodo(e) {
@@ -189,6 +189,7 @@ function addTodo(e) {
         //Bilgilendirme -- iki parametre alacak , içindeki mesaj ve alertin rengi için type
         showAlert("success","Görev başarıyla eklendi!");
         updateGoalDone();
+        
     }
 }
 
@@ -232,21 +233,28 @@ function addToDoStorage(newTodo) {
     // }
     todos.push(newTodo);
     localStorage.setItem("todos", JSON.stringify(todos)); //Burada da array olarak alınan todosa klavyeye ekleyerek alınan değeri jsona çevirerek ekledik
-    updateGoalDone();
+    // updateGoalDone();
 }
 
 
 
 function updateToDoCompleteStorage(todoID, isCompleted){
     
-    // checkToDosFromStorage();
+    checkToDosFromStorage();
+
+   
+
     const foundToDo = todos.find((todo) => todo.id === todoID);
-    
+    if (!foundToDo) {
+        return;
+    }
     //1) DEĞİŞTİRMEDEN ÖNCE: bu görev bugün mü tamamlanmıştı?
     const today = new Date().toDateString();
     const wasCompletedToday = foundToDo.completedDate === today;
     
     
+    
+
     //2) görevin durumunu ve tarihini güncelle
     if(isCompleted){
         foundToDo.completedDate = today;
@@ -256,7 +264,7 @@ function updateToDoCompleteStorage(todoID, isCompleted){
     }
     
     foundToDo.completed = isCompleted;
-    const count = Math.max(0, getDoneCount() - 1);
+    
     
     
     if (isCompleted) {
@@ -287,6 +295,7 @@ function checkToDosFromStorage() {
     //Burada soruyor ki localStorage de todos keyine sahip bir şey var mı?
     if (localStorage.getItem("todos")===null) {
         todos = []; //Yoksa boş başlat
+        return;
     }
     try {
         todos = JSON.parse(localStorage.getItem("todos")); //araya çevrilmiş şekilde todosumu aldım
@@ -320,13 +329,6 @@ function checkGoalCounterFromStorage(){
         goalValue = 1;
     }
 }
-
-
-
-function checkNewDay() {
-    
-}
-
 
 function showAlert(type, message){
     
@@ -385,7 +387,7 @@ function changeGoalCircle(finishedGoal, waitingGoal){
             //buraya geldiyse zaten 25 ve üstü, alt sınırı tekrar yazmaya gerek yok
             spanGoalMessage.textContent = "Hadi ama yapabilirsin!";
             break;
-        case (yuzde <= 100):
+        case (yuzde < 100):
             spanGoalMessage.textContent = "Az kaldı, devam et!";
             break;
         default:
@@ -400,27 +402,46 @@ function checkDoneToggle(yuzde){
     dailyGoal.classList.toggle("done", yuzde >= 100);
 }
 
-function apiGetQuotes(api){
-    fetch(`${api}/`).then(response => {
-    console.log("1) Response geldi, status:", response.status);
-    return response.json();   
+function apiGetQuotes(api, newQuote){
+    fetch(`${api}`)
+    .then(response => {
+        if (!response.ok) {
+            throw new Error("HTTP hata: " + response.status); //404 gibi durumlarda catch'e düşsün
+        }
+        return response.json();
     })
-    .then( quotes =>{
-        const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
-        randomQuote = quotes[randomQuoteIndex];
+    .then(quotes => {
+        const today = new Date().toDateString();
+        const savedQuote = JSON.parse(localStorage.getItem("dailyQuote")); //yoksa null gelir
 
+        let quoteToShow;
         
-        document.querySelector("#quoteText").textContent = randomQuote.quote;
-        document.querySelector("#quoteAuthor").textContent = randomQuote.author;
-        
-        
+        //bugün için kaydedilmiş bir söz var mı?
+        if (!newQuote && savedQuote && savedQuote.date === today) {
+            //varsa id'sine göre aynı sözü bul
+            quoteToShow = quotes.find(quote => quote.id === savedQuote.id);
+        }
+
+        //bugün için söz yoksa (yeni gün / ilk açılış) ya da kayıtlı id json'da bulunamadıysa
+        if (!quoteToShow) {
+            const randomQuoteIndex = Math.floor(Math.random() * quotes.length);
+            quoteToShow = quotes[randomQuoteIndex];
+
+            //bugünün sözü olarak kaydet (stringify ile!)
+            const dailyQuote = {
+                id : quoteToShow.id,
+                date : today
+            };
+            localStorage.setItem("dailyQuote", JSON.stringify(dailyQuote));
+        }
+
+        document.querySelector("#quoteText").textContent = quoteToShow.quote;
+        document.querySelector("#quoteAuthor").textContent = quoteToShow.author;
     })
-
-    .catch(function (err) {
-        //dosya bulunamazsa, json bozuksa ya da Live Server açık değilse buraya düşer
+    .catch(err => {
         console.error("Söz yüklenemedi:", err);
-        document.querySelector("#quoteText").textContent = "Söz yüklenemedi...";    
-});
+        document.querySelector("#quoteText").textContent = "Söz yüklenemedi...";
+    });
 }
 
 function checkToday() {
