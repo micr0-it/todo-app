@@ -83,7 +83,11 @@ function removeToDoALL() {
         //son görevin animasyonu da bitince listeyi boşalt
         //son görev (toDoList.length - 1) * 60 ms sonra başlıyor, üstüne 300ms animasyon süresi
         setTimeout(function () {
-            taskList.innerHTML = "";
+            //innerHTML = "" yerine sadece silinecek görevleri kaldırdık
+            //böylece animasyon sırasında yeni bir görev eklenirse o silinmez
+            toDoList.forEach(function (todo) {
+                todo.remove();
+            });
         }, (toDoList.length - 1) * 60 + 300);
         
         //Storageden Silme İşlemi
@@ -91,7 +95,7 @@ function removeToDoALL() {
         localStorage.setItem("todos",JSON.stringify(todos));//Direk boş dizi verdik sildik
 
         //Hedef sayacını da sıfırla, eskiden sayfayı yenileyene kadar eski sayı kalıyordu
-        updateGoalDone();
+        // updateGoalDone();
     }
     else{
         showAlert("danger","Silme işlemi için en az 1 adet görev ekleyin...");
@@ -138,7 +142,7 @@ function removeToDoUI(e) {
             todoLiTag.remove(); //animasyon bitince (300ms) li'yi gerçekten sil
         }, 300);
         
-        //Burada Storage'den sileceğiz bize value değer lazım bunu da todoLiTag'teki text contenti alarak yapalım
+        //Burada Storage'den sileceğiz bize value değer lazım bunu da todoLiTag'teki id alarak yapalım
         removeToDoStorage(Number(todoLiTag.dataset.id));
         /**
          * Number neden şart? Storage’daki id bir sayı (1730000000000). 
@@ -156,7 +160,7 @@ function removeToDoStorage(removeToDoId) {
     
     //eskiden forEach ile dönüp splice yapıyorduk:
     //aynı isimde iki görev varsa ikisi de siliniyordu, bir de forEach içinde splice dizi kaydığı için eleman atlatıyordu
-    //indexOf sadece İLK eşleşenin indexini verir, bulamazsa -1 döner
+    //findIndex
     const index = todos.findIndex(function (todo) {
         return todo.id === removeToDoId;
     });
@@ -165,7 +169,7 @@ function removeToDoStorage(removeToDoId) {
     }
     //silme işlemi tamamlandı yeni arrayi storage'a atamak ıcın json'a çevirip verdik
     localStorage.setItem("todos",JSON.stringify(todos));
-    updateGoalDone();
+    // updateGoalDone();
 }
 
 function showGoalCountsUI() {
@@ -201,7 +205,7 @@ function addTodo(e) {
         addToDoStorage(newTodo);
         //Bilgilendirme -- iki parametre alacak , içindeki mesaj ve alertin rengi için type
         showAlert("success","Görev başarıyla eklendi!");
-        updateGoalDone();
+        // updateGoalDone();
         
     }
 }
@@ -233,7 +237,6 @@ function saveGoalToStorage(){
 
 
 //addGoalCounter ve removeGoalCounter birebir aynıydı, tek fonksiyon yaptık
-//NOT: şu an EKLENEN görev sayısını sayıyor, tamamlama özelliği gelince burayı değiştir ** değiştirildi
 
 
 function addToDoStorage(newTodo) {
