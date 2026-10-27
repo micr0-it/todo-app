@@ -100,13 +100,13 @@ Renkler `style.css`'in en üstündeki `:root` bölümünden değiştirilebilir.
 - [x] Günün sözü (fetch + JSON)
 - [x] Kod temizliği: tekrar eden fonksiyonlar birleştirildi, hatalar giderildi
 - [x] Responsive tasarım
+- [x] **Görev tamamlama:** Göreve tıklayınca `completed` class'ı eklendi
+- [x] **Storage yapısını değiştirme:** `["Ödev"]` yerine `[{ text: "Ödev", completed: false }]` kullanılacak. Ekleme, silme, listeleme ve `removeToDoStorage` buna göre güncellendi
+- [x] **Sayacı düzeltme:** Yüzde, eklenen görevlere göre değil tamamlanan görevlere göre hesaplandı (`todos.filter(todo => todo.completed).length`)
+- [x] **Gün kontrolü:** Yeni bir günde sayaç sıfırlanacak (`lastDate` ile `toDateString()` karşılaştırıldı)
+- [x] `checkDoneToggle` tek satıra indirilecek ve `switch`'in dışına alındı
 
-### Tamamlananlar
-- [x] **Görev tamamlama:** Göreve tıklayınca `completed` class'ı eklenecek
-- [x] **Storage yapısını değiştirme:** `["Ödev"]` yerine `[{ text: "Ödev", completed: false }]` kullanılacak. Ekleme, silme, listeleme ve `removeToDoStorage` buna göre güncellenecek.
-- [x] **Sayacı düzeltme:** Yüzde, eklenen görevlere göre değil tamamlanan görevlere göre hesaplanacak (`todos.filter(todo => todo.completed).length`)
-- [x] **Gün kontrolü:** Yeni bir günde sayaç sıfırlanacak (`lastDate` ile `toDateString()` karşılaştırılarak)
-- [x] `checkDoneToggle` tek satıra indirilecek ve `switch`'in dışına alınacak
+
 
 ### Verilen Kararlar
 - [x] Tamamlanmış bir görev silinince yüzde düşsün mü, sabit mi kalsın?
@@ -115,7 +115,7 @@ Renkler `style.css`'in en üstündeki `:root` bölümünden değiştirilebilir.
 - [x] Günün sözü gün boyunca aynı mı kalsın, her açılışta mı değişsin?
 
 ### Gelecek Fikirleri
-- [ ] Hedef %100 olunca özel bir tebrik sözü gösterme
+- [x] Hedef %100 olunca özel bir tebrik sözü gösterme
 - [ ] Projeyi React ile yeniden yazma
 
 ---
