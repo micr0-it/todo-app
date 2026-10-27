@@ -73,8 +73,18 @@ function removeToDoALL() {
     const toDoList = document.querySelectorAll(".task-item");
     if (toDoList.length>0) {
 
-        //Arayüzden silme -- tek tek forEach ile dönmek yerine listenin içini direk boşalttık
-        taskList.innerHTML = "";
+        //Arayüzden silme -- her görevi bir öncekinden 60ms sonra başlattık (dalga etkisi)
+        toDoList.forEach(function (todo, index) {
+            setTimeout(function () {
+                todo.classList.add("removing");
+            }, index * 60);
+        });
+
+        //son görevin animasyonu da bitince listeyi boşalt
+        //son görev (toDoList.length - 1) * 60 ms sonra başlıyor, üstüne 300ms animasyon süresi
+        setTimeout(function () {
+            taskList.innerHTML = "";
+        }, (toDoList.length - 1) * 60 + 300);
         
         //Storageden Silme İşlemi
         todos = [];
@@ -123,7 +133,10 @@ function removeToDoUI(e) {
         e.preventDefault(); //href="#" sayfayı en üste zıplatmasın
         
         const todoLiTag = deleteButton.parentElement; //a'nın parenti direk li
-        todoLiTag.remove(); //li ye eriştik ve sildi
+        todoLiTag.classList.add("removing"); //yana kayarak kaybolma animasyonunu başlat
+        setTimeout(function () {
+            todoLiTag.remove(); //animasyon bitince (300ms) li'yi gerçekten sil
+        }, 300);
         
         //Burada Storage'den sileceğiz bize value değer lazım bunu da todoLiTag'teki text contenti alarak yapalım
         removeToDoStorage(Number(todoLiTag.dataset.id));
