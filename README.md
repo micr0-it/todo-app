@@ -14,7 +14,7 @@ Neo-brutalist tasarıma sahip, günlük hedef takibi yapan ve her gün motivasyo
   - Hedef sayısı `+` / `−` butonlarıyla ayarlanabilir (en az 1)
   - Yüzdeye göre değişen motivasyon mesajı
   - %100'e ulaşınca yeşile dönen halka ve "Hedef Tamam!" damgası
-- **Günün sözü:** `fetch` ile JSON dosyasından rastgele çekilen motivasyon ve disiplin sözleri
+- **Günün sözü:** `fetch` ile JSON'dan çekilen motivasyon sözü gün boyunca aynı kalır, "Yeni Söz" butonuyla değiştirilebilir
 - **Responsive tasarım:** 320 pikselden masaüstüne kadar her ekrana uyumlu
 
 ---
@@ -101,7 +101,7 @@ Renkler `style.css`'in en üstündeki `:root` bölümünden değiştirilebilir.
 - [x] Kod temizliği: tekrar eden fonksiyonlar birleştirildi, hatalar giderildi
 - [x] Responsive tasarım
 
-### Sıradakiler
+### Tamamlananlar
 - [x] **Görev tamamlama:** Göreve tıklayınca `completed` class'ı eklenecek
 - [x] **Storage yapısını değiştirme:** `["Ödev"]` yerine `[{ text: "Ödev", completed: false }]` kullanılacak. Ekleme, silme, listeleme ve `removeToDoStorage` buna göre güncellenecek.
 - [x] **Sayacı düzeltme:** Yüzde, eklenen görevlere göre değil tamamlanan görevlere göre hesaplanacak (`todos.filter(todo => todo.completed).length`)
@@ -112,7 +112,7 @@ Renkler `style.css`'in en üstündeki `:root` bölümünden değiştirilebilir.
 - [x] Tamamlanmış bir görev silinince yüzde düşsün mü, sabit mi kalsın?
 - [x] Yeni gün başlayınca neler sıfırlansın? (sadece sayaç / tamamlanan görevler / hedef)
 - [x] "Tebrikler Dostum!" mesajı %76'dan itibaren mi çıksın, sadece %100'de mi?
-- [ ] Günün sözü gün boyunca aynı mı kalsın, her açılışta mı değişsin?
+- [x] Günün sözü gün boyunca aynı mı kalsın, her açılışta mı değişsin?
 
 ### Gelecek Fikirleri
 - [ ] Hedef %100 olunca özel bir tebrik sözü gösterme
